@@ -95,6 +95,6 @@ class FastQuerySet(QuerySet):
                 convert = self.__class__.TYPE_MAP.get(type(v))
 
                 parsed[self.demangle_annotation(k)] = v if not convert else convert(v)
-            parsed["updated_detail"] = None
+            # parsed["updated_detail"] = None
             result.append(parsed)
         return result
