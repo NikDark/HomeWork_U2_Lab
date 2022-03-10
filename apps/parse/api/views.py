@@ -10,7 +10,7 @@ from apps.core.fast.utils import get_fast_response
 from apps.core.utils import format_error_response
 from apps.parse.api.serializers import CHAPTER_FIELDS, MANGA_FIELDS
 from apps.parse.const import CHAPTER_PARSER, DETAIL_PARSER, IMAGE_PARSER
-from apps.parse.models import  Manga
+from apps.parse.models import Manga
 from apps.parse.scrapy.utils import run_parser
 from apps.parse.utils import fast_annotate_manga_query, needs_update
 
@@ -30,7 +30,7 @@ class MangaViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
         manga = Manga.objects.filter(pk=pk).parse_values(*MANGA_FIELDS)[0]
         try:
             criterea = manga["updated_detail"]
-            if not criterea or needs_update(criterea):
+            if criterea and needs_update(criterea):
                 run_parser(DETAIL_PARSER, "readmanga", manga["source_url"])
                 run_parser(CHAPTER_PARSER, "readmanga", manga["source_url"])
                 now = datetime.now()
@@ -76,6 +76,4 @@ class MangaViewSet(mixins.RetrieveModelMixin, viewsets.GenericViewSet):
         except Exception as e:
             return format_error_response("Errors occurred during parsing " + str(e))
         return get_fast_response(
-            list(manga.chapters.order_by("-volume", "-number").values(*CHAPTER_FIELDS))
-        )
-
+            list(manga.chapters.order_by("-volume", "-number").values(*CHAPTER_FIELDS)))
